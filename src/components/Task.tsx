@@ -1,22 +1,21 @@
 import { Box, Chip } from '@mui/material';
+import useTaskStore from '../zustand/store.ts';
 
 interface TaskProps {
   title: string;
 }
 
-const STATUS = 'PLANNED';
-
 const Task = (props: TaskProps) => {
   const { title } = props;
 
+  const task = useTaskStore(store => store.tasks.find(task => task.title === title));
+
   const renderStatus = () => {
-    switch (STATUS) {
+    switch (task?.state) {
       case 'PLANNED':
         return <Chip size="small" label="PLANNED" color="primary" />;
-      // @ts-ignore
       case 'ONGOING':
         return <Chip size="small" label="ONGOING" color="warning" />;
-      // @ts-ignore
       case 'DONE':
         return <Chip size="small" label="DONE" color="success" />;
     }
@@ -36,7 +35,7 @@ const Task = (props: TaskProps) => {
         cursor: 'move',
       }}
     >
-      <Box>{title}</Box>
+      <Box>{task?.title}</Box>
       <Box
         sx={{
           display: 'flex',

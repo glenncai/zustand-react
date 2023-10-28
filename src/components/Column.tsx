@@ -1,5 +1,6 @@
 import { Card, Typography } from '@mui/material';
 import Task from './Task.tsx';
+import useTaskStore from '../zustand/store.ts';
 
 interface ColumnProps {
   state: string;
@@ -7,6 +8,8 @@ interface ColumnProps {
 
 const Column = (props: ColumnProps) => {
   const { state } = props;
+
+  const tasks = useTaskStore(store => store.tasks.filter(task => task.state === state));
 
   return (
     <Card
@@ -21,7 +24,9 @@ const Column = (props: ColumnProps) => {
       }}
     >
       <Typography paragraph={true}>{state}</Typography>
-      <Task title="Todo" />
+      {tasks.map(task => (
+        <Task key={task.title} title={task.title} />
+      ))}
     </Card>
   );
 };
