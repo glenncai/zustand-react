@@ -11,6 +11,7 @@ const Task = (props: TaskProps) => {
 
   const task = useTaskStore(store => store.tasks.find(task => task.title === title));
   const deleteTask = useTaskStore(store => store.deleteTask);
+  const setDraggedTask = useTaskStore(store => store.setDraggedTask);
 
   const renderStatus = () => {
     switch (task?.state) {
@@ -25,6 +26,8 @@ const Task = (props: TaskProps) => {
 
   return (
     <Box
+      draggable
+      onDragStart={() => setDraggedTask(task!)}
       sx={{
         color: '#222222',
         background: '#ffffff',

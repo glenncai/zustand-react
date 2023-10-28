@@ -13,6 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Task from './Task.tsx';
 import useTaskStore, { TaskStoreProps } from '../zustand/store.ts';
 import { useState } from 'react';
+import { shallow } from 'zustand/shallow';
 
 interface ColumnProps {
   state: string;
@@ -22,9 +23,13 @@ const Column = (props: ColumnProps) => {
   const { state } = props;
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
+  const [drop, setDrop] = useState(false);
 
-  const tasks = useTaskStore(store => store.tasks.filter(task => task.state === state));
+  const tasks = useTaskStore(store => store.tasks.filter(task => task.state === state), shallow);
   const addTask = useTaskStore(store => store.addTask);
+  const setDraggedTask = useTaskStore(store => store.setDraggedTask);
+  const draggedTask = useTaskStore(store => store.draggedTask);
+  const moveTask = useTaskStore(store => store.moveTask);
 
   const handleOpen = () => setOpen(true);
 
@@ -51,6 +56,25 @@ const Column = (props: ColumnProps) => {
           color: '#ffffff',
           margin: '0 0.5rem',
           padding: '0.5rem',
+          border: drop ? 'dashed #ffffff 3px' : 'dashed transparent 3px',
+        }}
+        onDragOver={e => {
+          e.preventDefault();
+          setDrop(true);
+        }}
+        onDragLeave={e => {
+          e.preventDefault();
+          setDrop(false);
+        }}
+        onDrop={e => {
+          e.preventDefault();
+          setDrop(false);
+          const newTask: TaskStoreProps = {
+            title: draggedTask!.title,
+            state,
+          };
+          moveTask(newTask);
+          setDraggedTask(null);
         }}
       >
         <Box
