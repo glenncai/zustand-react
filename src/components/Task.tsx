@@ -1,4 +1,5 @@
 import { Box, Chip } from '@mui/material';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import useTaskStore from '../zustand/store.ts';
 
 interface TaskProps {
@@ -9,6 +10,7 @@ const Task = (props: TaskProps) => {
   const { title } = props;
 
   const task = useTaskStore(store => store.tasks.find(task => task.title === title));
+  const deleteTask = useTaskStore(store => store.deleteTask);
 
   const renderStatus = () => {
     switch (task?.state) {
@@ -43,7 +45,9 @@ const Task = (props: TaskProps) => {
           justifyContent: 'space-between',
         }}
       >
-        <Box></Box>
+        <Box onClick={() => deleteTask(task!)} sx={{ zIndex: 100, cursor: 'pointer' }}>
+          <DeleteForeverIcon />
+        </Box>
         <Box>{renderStatus()}</Box>
       </Box>
     </Box>
