@@ -1,4 +1,5 @@
-import { createWithEqualityFn } from 'zustand/traditional';
+import { createWithEqualityFn as create } from 'zustand/traditional';
+import { devtools } from 'zustand/middleware';
 
 export interface TaskStoreProps {
   title: string;
@@ -14,15 +15,22 @@ interface TaskState {
   moveTask: (task: TaskStoreProps) => void;
 }
 
-const useTaskStore = createWithEqualityFn<TaskState>()(set => ({
-  tasks: [],
-  draggedTask: null,
-  addTask: task => set(state => ({ tasks: [...state.tasks, task] })),
-  deleteTask: (task: TaskStoreProps) =>
-    set(state => ({ tasks: state.tasks.filter(t => t !== task) })),
-  setDraggedTask: (task: TaskStoreProps | null) => set({ draggedTask: task }),
-  moveTask: (task: TaskStoreProps) =>
-    set(state => ({ tasks: state.tasks.map(t => (t.title === task.title ? task : t)) })),
-}));
+const useTaskStore = create<TaskState>()(
+  devtools(set => ({
+    tasks: [],
+    draggedTask: null,
+    addTask: task => set(state => ({ tasks: [...state.tasks, task] }), false, 'addTask'),
+    deleteTask: (task: TaskStoreProps) =>
+      set(state => ({ tasks: state.tasks.filter(t => t !== task) }), false, 'deleteTask'),
+    setDraggedTask: (task: TaskStoreProps | null) =>
+      set({ draggedTask: task }, false, 'setDraggedTask'),
+    moveTask: (task: TaskStoreProps) =>
+      set(
+        state => ({ tasks: state.tasks.map(t => (t.title === task.title ? task : t)) }),
+        false,
+        'moveTask'
+      ),
+  }))
+);
 
 export default useTaskStore;
